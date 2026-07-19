@@ -1,0 +1,19 @@
+﻿<footer class="mb-2">
+    <nav class="navbar navbar-expand-md bg-primary" data-bs-theme="dark">
+        <ul class="navbar-nav mx-auto">
+            @foreach (var item in WebApp.Site.Sitemap.Where(i => i.IsHidden && i.MenuTitle.Contains("Fusszeile", StringComparison.InvariantCultureIgnoreCase)))
+            {
+                foreach (var footerItem in item.Items.Where(i => !i.IsHidden))
+                {
+                    <li class="nav-item@(footerItem.Id == WebApp.PageId || footerItem.HasChild(WebApp.PageId) ? " active" : "")">
+                        <a class="nav-link" href="@footerItem.Permalink">@footerItem.MenuTitle</a>
+                    </li>
+                }
+            }
+            <li class="nav-item">
+                @* Cookie Consent Opener is wired-up in _CookieConsent.html *@
+                <button id="cookie-consent-opener" type="button" class="nav-link btn btn-link border-0"><img src="~/assets/svg/cookie-settings.svg" style="width:10pt" alt="Cookie-Einstellungen" title="Cookie-Einstellungen"/></button>
+            </li>
+        </ul>
+    </nav>
+</footer>

@@ -1,0 +1,47 @@
+﻿@model (Piranha.Models.PageInfo ArchiveInfo, Piranha.Models.PostInfo Post, bool ShowImage)
+@{
+    var post = Model.Post;
+    var archiveInfo = Model.ArchiveInfo;
+}
+<article class="h-100"> @* h-100 so header background-color fills full height *@
+    <div class="alert alert-light p-2 h-100">
+        @if (post.PrimaryImage.HasValue && Model.ShowImage)
+        {
+            <a href="@post.Permalink">
+                <img class="rounded mb-3" src="@Url.Content(WebApp.Media.ResizeImage(post.PrimaryImage, 1140, 450))" alt="@post.PrimaryImage.Media.AltText">
+            </a>
+        }
+        <a href="@post.Permalink" style="text-decoration: none">
+            <h3>@post.Title</h3>
+        </a>
+        <p class="post-meta">
+            @if (post.IsPublished)
+            {
+                <span>
+                    @post.Published?.ToString("M") <a href="@archiveInfo.Permalink/year/@post.Published?.Year">@post.Published?.Year</a>
+                </span>
+            }
+            <span>
+                Rubrik: <a href="@archiveInfo.Permalink/category/@post.Category.Slug">@post.Category.Title</a>
+            </span>
+            <span>
+                Tags:
+                @foreach (var tag in post.Tags)
+                {
+                    <a href="@archiveInfo.Permalink/tag/@tag.Slug">#@tag.Slug</a>
+                }
+            </span>
+            @if (post.EnableComments && post.CommentCount > 0)
+            {
+                <span>
+                    <a href="@post.Permalink#comments">@post.CommentCount @(post.CommentCount == 1 ? "Kommentar" : "Kommentare")</a>
+                </span>
+            }
+        </p>
+        @if (!string.IsNullOrWhiteSpace(post.Excerpt))
+        {
+            <p>@Html.Raw(post.Excerpt)</p>
+        }
+        <a href="@post.Permalink" class="btn btn-sm btn-primary">Mehr dazu</a>
+    </div>
+</article>

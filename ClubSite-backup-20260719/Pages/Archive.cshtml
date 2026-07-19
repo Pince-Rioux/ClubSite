@@ -1,0 +1,40 @@
+@page
+@model ArchivePage<StandardArchive, Piranha.Models.PostInfo>
+@{
+    Model.ViewData["Title"] = Model.Data.Title;
+    var archiveInfo = await WebApp.Api.Pages.GetByIdAsync<Piranha.Models.PageInfo>(Model.Data.Id);
+    
+    var showAll = HttpContext.Request.Query.ContainsKey("all");
+    var showFiltered = Model.Archive.Year != null
+                       || Model.Archive.Category != null
+                       || Model.Archive.Tag != null;
+    var showMainPage = !(showAll || showFiltered);
+    
+    // Set Archive Excerpt to string.Empty if empty
+    if (Library.HtmlTool.IsEmptyHtml(Model.Data.Excerpt ?? string.Empty))
+    {
+        Model.Data.Excerpt = string.Empty;
+    }
+    // Set all Archive post Excerpts to string.Empty if empty
+    foreach (var post in Model.Archive.Posts)
+    {
+        if (Library.HtmlTool.IsEmptyHtml(post.Excerpt ?? string.Empty))
+        {
+            post.Excerpt = string.Empty;
+        }
+    }
+}
+@if (showMainPage)
+{
+    <partial name="_ArchiveHeader" model="archiveInfo"/>
+    <partial name="_ArchiveMain" model="Model"/>
+}
+else
+{
+    <partial name="_ArchiveHeader" model="archiveInfo"/>
+    <partial name="_ArchivePosts" model="Model"/>
+}
+@section head
+{
+    @WebApp.MetaTags(Model.Data, generator: false, opengraph: false)
+}

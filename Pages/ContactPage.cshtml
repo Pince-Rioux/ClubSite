@@ -1,0 +1,101 @@
+﻿@page
+@model ClubSite.Pages.ContactPageModel
+@{
+    // Disable caching in order to make AntiForgeryToken work
+    HttpContext.Response.Headers.Remove("Cache-Control");
+    HttpContext.Response.Headers.Remove("Pragma");
+    HttpContext.Response.Headers.TryAdd("Cache-Control", "no-store, no-cache, must-revalidate");
+    HttpContext.Response.Headers.TryAdd("Pragma", "no-cache");
+}
+<div class="mx-3 py-2">
+    @{
+        ViewData["Title"] = "Kontakt";
+
+        List<SelectListItem> GenderList()
+        {
+            return new()
+            {
+                    new SelectListItem { Value = string.Empty, Text = "Bitte auswählen" },
+                    new SelectListItem { Value = "f", Text = "Frau" },
+                    new SelectListItem { Value = "m", Text = "Herr" }
+                };
+        }
+    }
+    <div>
+        <h2 class="h2">@ViewData["Title"]</h2>
+        <h4 class="h4">Nachricht an den VC Neusäß</h4>
+        <hr />
+    </div>
+    <div class="mb-4">
+        @* Create the action url using the same named route as when invoking the controller action method *@
+        <form method="post" class="col-md-8 col-sm-10 col-12 ps-0" role="form" novalidate>
+            <div asp-validation-summary="All" class="rounded alert alert-danger border-danger">
+            </div>
+            <div>
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" type="text" required="required" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Gender" class="form-label"></label>
+                <select asp-for="Gender" asp-items="GenderList()" class="form-select" required="required"></select>
+                <span asp-validation-for="Gender" class="text-danger"></span>
+            </div>
+            <div>
+                <label asp-for="FirstName" class="form-label"></label>
+                <input asp-for="FirstName" type="text" required="required" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div>
+                <label asp-for="LastName" class="form-label"></label>
+                <input asp-for="LastName" type="text" required="required" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+            <div>
+                <label asp-for="PhoneNumber" class="form-label"></label>
+                <input asp-for="PhoneNumber" type="text" class="form-control" />
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+            <div>
+                <label asp-for="Subject" class="form-label"></label>
+                <input asp-for="Subject" type="text" required="required" class="form-control" autocomplete="off" />
+                <span asp-validation-for="Subject" class="text-danger"></span>
+            </div>
+            <div>
+                <label asp-for="Message" class="form-label"></label>
+                <textarea asp-for="Message" class="form-control" rows="5"></textarea>
+                <span asp-validation-for="Message" class="text-danger"></span>
+            </div>
+            <div class="col-md-6">
+                <div class="mt-2">
+                    <img id="CaptchaImage" style="vertical-align: bottom; display: inline" src="@Url.Action(nameof(Controllers.Captcha.Index), nameof(Controllers.Captcha))@("?guid=" + Guid.NewGuid())" alt="Captcha" title="" />
+                    <label class="d-inline" onclick="javascript:if (document.images) document.images.CaptchaImage.src = '@Url.Action(nameof(Controllers.Captcha.Index), nameof(Controllers.Captcha))?new=1&amp;time=' + new Date().getTime();" style="cursor: pointer">
+                        <i class="fas fa-sync-alt fa-2x" style="margin: 0 5px 0 5px;" title="Neu laden"></i>
+                    </label><br />
+                </div>
+                <label asp-for="Captcha" class="form-label"></label>
+                <div>
+                    <div class="input-group">
+                        <input asp-for="Captcha" required="required" type="text" class="form-control" maxlength="7" autocomplete="off" />
+                        <span class="input-group-text">
+                            <strong style="font-size: 1rem">=</strong>
+                        </span>
+                    </div>
+                    <span asp-validation-for="Captcha" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="mt-4">
+                <button type="submit" formaction="@Model.Data.Permalink" class="btn btn-lg btn-primary" style="width: 100%">Nachricht senden</button>
+            </div>
+        </form>
+    </div>
+</div>
+@section script {
+    <script type="text/javascript">
+        //<![CDATA[
+        var textbox = document.getElementById('@Html.NameFor(m => m.Email)');
+        if (textbox)
+            textbox.focus();
+        //]]>
+    </script>
+}

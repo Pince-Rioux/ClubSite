@@ -1,0 +1,33 @@
+@use '../bs_custom' as custom;
+
+.main { // _Layout
+    background-color: #fff;
+}
+
+main {  // needed for Post, Archive, Page
+    padding: 1rem 0;
+}
+
+img {
+    max-width: 100%;
+}
+
+.navbar .clubname {
+    color: custom.$yellow;
+}
+
+a.link {
+    &:before {
+        font-family: 'Font Awesome 5 Free', sans-serif;
+        font-weight: 900;
+        font-size: 1rem;
+        content: "\f35d";
+        padding-right: .25rem;
+        padding-left: .25rem;
+        display: inline;
+    }
+}
+
+input[type="password"], input[type="text"]:required, input[type="email"]:required, select:required {
+    border-left: .5rem solid custom.$secondary;
+}
