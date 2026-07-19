@@ -15,6 +15,7 @@ The ClubSite project maintains a nested directory structure with the main code r
 - New services: `ClubSite/Services/`
 - New pages: `ClubSite/Pages/`
 - New data files: `ClubSite/Data/`
+- Startup configuration: `ClubSite/WebAppStartup.cs`
 
 ## Important
 Any changes to this structure must be explicitly approved. The current nested structure is fundamental to the project's architecture and should be preserved in all future development.
