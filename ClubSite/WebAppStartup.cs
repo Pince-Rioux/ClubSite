@@ -25,6 +25,7 @@ using Microsoft.Net.Http.Headers;
 using Piranha.AttributeBuilder;
 using Piranha.Manager.Editor;
 using Piranha;
+using ClubSite.Data;
 
 namespace ClubSite;
 
@@ -54,6 +55,23 @@ public static class WebAppStartup
         // Custom ClubSite db context
         services.AddDbContext<Data.ClubDbContext>((sp, options) =>
             options.UseSqlServer(configuration.GetConnectionString("VolleyballClub")));
+
+        // Membership context (separate database)
+        services.AddDbContext<Data.ClubContext>(options =>
+            options.UseSqlServer(configuration.GetConnectionString("ClubMembershipDb")));
+
+        // Membership identity services (no cookie middleware â€” Piranha handles that)
+        services.AddIdentityCore<Models.User>(options =>
+            {
+                // Password requirements
+                options.Password.RequireDigit = true;
+                options.Password.RequiredLength = 8;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireLowercase = true;
+            })
+            .AddRoles<Models.Role>()
+            .AddEntityFrameworkStores<Data.ClubContext>();
 
         // Piranha service setup
         services.AddPiranha(svcBuilder =>
@@ -107,8 +125,15 @@ public static class WebAppStartup
 
         services.AddTransient<Services.IMailService, Services.MailService>();
 
+        // Membership configuration
+        services.Configure<ClubMembershipSettings>(
+            configuration.GetSection(ClubMembershipSettings.SectionName));
+
+        // Membership service
+        services.AddScoped<Services.IMembershipService, Services.DefaultMembershipService>();
+
         // We use EPPlus in a noncommercial context according to the Polyform Noncommercial license:
-        OfficeOpenXml.ExcelPackage.License.SetNonCommercialOrganization("Volleyballclub Neusäß e.V.");
+        OfficeOpenXml.ExcelPackage.License.SetNonCommercialOrganization("Volleyballclub Neusï¿½ï¿½ e.V.");
     }
 
     /// <summary>
