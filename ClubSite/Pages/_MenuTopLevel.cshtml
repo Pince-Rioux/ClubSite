@@ -16,14 +16,14 @@
                         {
                             <li class="nav-item@(item.Id == WebApp.PageId || item.HasChild(WebApp.PageId) ? " active" : "")">
                                 <a class="nav-link" href="@item.Permalink">@item.MenuTitle@*item.Items.Count*@</a>
-                                <partial name="_MenuDropdown" model="item" />
+                                <partial name="~/Pages/_MenuDropdown.cshtml" model="item" />
                             </li>
                         }
                         else
                         {
                             <li class="nav-item dropdown@(item.Id == WebApp.PageId || item.HasChild(WebApp.PageId) ? " active" : "")">
                                 <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="@item.Permalink" role="button">@item.MenuTitle@*item.Items.Count*@</a>
-                                <partial name="_MenuDropdown" model="item" />
+                                <partial name="~/Pages/_MenuDropdown.cshtml" model="item" />
                             </li>
                         }
                     }

@@ -19,13 +19,16 @@ using Piranha.AspNetCore.Identity.SQLServer;
 using Piranha.Data.EF.SQLServer;
 using System;
 using Microsoft.AspNetCore.Http;
-using ClubSite.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Net.Http.Headers;
 using Piranha.AttributeBuilder;
 using Piranha.Manager.Editor;
 using Piranha;
-using ClubSite.Data;
+using ClubSite.Data; // ClubDbContext (Piranha), keeps existing code
+using ClubSite.Models; // Custom Piranha block types
+// Membership RCL — activated by config flag
+using ClubSite.Membership.Extensions;
+using ClubSite.Membership.Services;
 
 namespace ClubSite;
 
@@ -52,26 +55,19 @@ public static class WebAppStartup
 
         services.AddMemoryCache(); // Adds a default in-memory cache implementation
 
-        // Custom ClubSite db context
+        // Piranha CMS database
         services.AddDbContext<Data.ClubDbContext>((sp, options) =>
             options.UseSqlServer(configuration.GetConnectionString("VolleyballClub")));
 
-        // Membership context (separate database)
-        services.AddDbContext<Data.ClubContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("ClubMembershipDb")));
+        // === Membership Module (RCL) — optional, activated by config ===
+        var membershipEnabled = configuration.GetValue<bool>("ClubMembership:Enabled");
+        if (membershipEnabled)
+        {
+            services.AddClubSiteMembership(configuration);
 
-        // Membership identity services (no cookie middleware — Piranha handles that)
-        services.AddIdentityCore<Models.User>(options =>
-            {
-                // Password requirements
-                options.Password.RequireDigit = true;
-                options.Password.RequiredLength = 8;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = true;
-                options.Password.RequireLowercase = true;
-            })
-            .AddRoles<Models.Role>()
-            .AddEntityFrameworkStores<Data.ClubContext>();
+            // Override the RCL's log-only email sender with the real ClubSite mail service
+            services.AddScoped<IEmailSender, ClubSiteEmailSender>();
+        }
 
         // Piranha service setup
         services.AddPiranha(svcBuilder =>
@@ -124,13 +120,6 @@ public static class WebAppStartup
                 $"Configuration section '{nameof(ConfigurationPoco.MailSettings)}' not found."));
 
         services.AddTransient<Services.IMailService, Services.MailService>();
-
-        // Membership configuration
-        services.Configure<ClubMembershipSettings>(
-            configuration.GetSection(ClubMembershipSettings.SectionName));
-
-        // Membership service
-        services.AddScoped<Services.IMembershipService, Services.DefaultMembershipService>();
 
         // We use EPPlus in a noncommercial context according to the Polyform Noncommercial license:
         OfficeOpenXml.ExcelPackage.License.SetNonCommercialOrganization("Volleyballclub Neus�� e.V.");
@@ -197,10 +186,13 @@ public static class WebAppStartup
 
         #region *** Rewrite domains (even those without SSL certificate) to https://www.volleyballclub.de ***
 
-        app.UseRewriter(new RewriteOptions()
-            .AddRedirectToWwwPermanent()
-            .AddRedirectToHttpsPermanent()
-        );
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseRewriter(new RewriteOptions()
+                .AddRedirectToWwwPermanent()
+                .AddRedirectToHttpsPermanent()
+            );
+        }
 
         #endregion
 
@@ -225,26 +217,6 @@ public static class WebAppStartup
                 .AddAssembly(typeof(Program).Assembly)
                 .Build()
                 .DeleteOrphans();
-
-            // To build specific types:
-            // new ContentTypeBuilder(options.Api).AddType(typeof(...)
-
-            /*
-             * Here you can configure the different permissions
-             * that you want to use for securing content in the
-             * application.
-            options.UseSecurity(o =>
-            {
-                o.UsePermission("WebUser", "Web User");
-            });
-            */
-
-            /*
-             * Here you can specify the login url for the front end
-             * application. This does not affect the login url of
-             * the manager interface.
-                options.LoginUrl = "login";
-             */
         });
 
         // Register custom blocks

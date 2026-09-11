@@ -41,6 +41,11 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.9" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.23" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Membership\src\ClubSite.Membership\ClubSite.Membership.csproj" />
+  </ItemGroup>
+
   <ItemGroup>
     <Compile Update="Resources\StatusCodes.Designer.cs">
       <DesignTime>True</DesignTime>
