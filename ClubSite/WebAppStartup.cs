@@ -20,6 +20,7 @@ using Piranha.Data.EF.SQLServer;
 using System;
 using Microsoft.AspNetCore.Http;
 using ClubSite.Models;
+using ClubSite.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Net.Http.Headers;
 using Piranha.AttributeBuilder;
@@ -107,8 +108,11 @@ public static class WebAppStartup
 
         services.AddTransient<Services.IMailService, Services.MailService>();
 
+        // Calendar events service
+        services.AddSingleton<IcsCalendarService>();
+
         // We use EPPlus in a noncommercial context according to the Polyform Noncommercial license:
-        OfficeOpenXml.ExcelPackage.License.SetNonCommercialOrganization("Volleyballclub Neus‰ﬂ e.V.");
+        OfficeOpenXml.ExcelPackage.License.SetNonCommercialOrganization("Volleyballclub Neus√§√ü e.V.");
     }
 
     /// <summary>
