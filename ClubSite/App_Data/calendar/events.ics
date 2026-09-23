@@ -1,0 +1,119 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//VC Neusäß//Kalender//DE
+CALSCALE:GREGORIAN
+X-WR-CALNAME:VC Neusäß Termine
+X-WR-TIMEZONE:Europe/Berlin
+
+BEGIN:VTIMEZONE
+TZID:Europe/Berlin
+X-LIC-LOCATION:Europe/Berlin
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+
+BEGIN:VEVENT
+DTSTART;TZID=Europe/Berlin:20261009T190000
+DTEND;TZID=Europe/Berlin:20261009T203000
+RRULE:FREQ=WEEKLY;BYDAY=MO,WE;UNTIL=20261219T190000Z
+EXDATE;TZID=Europe/Berlin:20261014T190000
+EXDATE;TZID=Europe/Berlin:20261026T190000
+SUMMARY:Training Damen
+LOCATION:Sporthalle Mitte\, Sportpark Süd
+DESCRIPTION:Training der Damenmannschaft. Bitte in Sportkleidung erscheinen.
+CATEGORIES:Damen,Training
+UID:training-damen-001@volleyballclub.de
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTART;TZID=Europe/Berlin:20261020T190000
+DTEND;TZID=Europe/Berlin:20261020T210000
+RRULE:FREQ=WEEKLY;BYDAY=TU,TH;UNTIL=20261218T210000Z
+SUMMARY:Training Herren
+LOCATION:Sporthalle West
+DESCRIPTION:Training der Herrenmannschaft.
+CATEGORIES:Herren,Training
+UID:training-herren-001@volleyballclub.de
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTART;TZID=Europe/Berlin:20261012T200000
+DTEND;TZID=Europe/Berlin:20261012T213000
+RRULE:FREQ=WEEKLY;BYDAY=MO;UNTIL=20261221T213000Z
+SUMMARY:Training Jugend U16
+LOCATION:Sporthalle West
+CATEGORIES:Jugend,Training
+UID:training-jugend-001@volleyballclub.de
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTART;TZID=Europe/Berlin:20261010T150000
+DTEND;TZID=Europe/Berlin:20261010T180000
+SUMMARY:Spieltag Damen – VC Neusäß vs. TSV Haunstetten
+LOCATION:Sporthalle Mitte\, Sportpark Süd
+DESCRIPTION:Bezirksliga Damen – 1. Spieltag
+CATEGORIES:Damen,Spieltag
+UID:spieltag-20261010@volleyballclub.de
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTART;TZID=Europe/Berlin:20261017T140000
+DTEND;TZID=Europe/Berlin:20261017T170000
+SUMMARY:Spieltag Herren – VC Neusäß vs. VfL Augsburg
+LOCATION:Sporthalle West
+CATEGORIES:Herren,Spieltag
+UID:spieltag-20261017@volleyballclub.de
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTART;TZID=Europe/Berlin:20261121T180000
+DTEND;TZID=Europe/Berlin:20261121T220000
+SUMMARY:Weihnachtsfeier VC Neusäß
+LOCATION:Vereinsheim\, Parkstraße 12\, Neusäß
+DESCRIPTION:Alle Mitglieder sind herzlich eingeladen. Für Essen und Getränke ist gesorgt.
+CATEGORIES:Alle,Sonstiges
+UID:weihnachtsfeier-2026@volleyballclub.de
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTART;TZID=Europe/Berlin:20261115T100000
+DTEND;TZID=Europe/Berlin:20261115T170000
+SUMMARY:Mixed-Turnier VC Neusäß
+LOCATION:Sporthalle Mitte\, Sportpark Süd
+DESCRIPTION:Traditionelles Mixed-Turnier. Anmeldung bis 01.11.2026.
+CATEGORIES:Alle,Turnier
+UID:turnier-mixed-2026@volleyballclub.de
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTART;TZID=Europe/Berlin:20261020T160000
+DTEND;TZID=Europe/Berlin:20261020T180000
+SUMMARY:Jugendspieltag U12
+LOCATION:Sporthalle Grundschule West
+CATEGORIES:Jugend,Spieltag
+UID:jugendspieltag-20261020@volleyballclub.de
+END:VEVENT
+
+BEGIN:VEVENT
+DTSTART;TZID=Europe/Berlin:20261205T090000
+DTEND;TZID=Europe/Berlin:20261205T130000
+SUMMARY:Hallenschließung (Grundreinigung)
+LOCATION:Alle Hallen
+DESCRIPTION:An diesem Tag finden kein Training und keine Spiele statt. Alle Hallen sind wegen Grundreinigung geschlossen.
+CATEGORIES:Alle,Sonstiges
+UID:hallenschliessung-20261205@volleyballclub.de
+END:VEVENT
+
+END:VCALENDAR
