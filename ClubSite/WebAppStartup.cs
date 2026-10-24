@@ -198,6 +198,8 @@ public static class WebAppStartup
             App.Init(options.Api);
             // Allow SVG files to be uploaded in manager
             App.MediaTypes.Images.Add(".svg", "image/svg+xml", false);
+            // Allow .ics calendar files
+            App.MediaTypes.Documents.Add(".ics", "text/calendar", false);
             options.UseManager();
             options.UseTinyMCE();
             options.UseIdentity();
