@@ -16,13 +16,20 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        path: repo
+    - name: Checkout Membership RCL
+      uses: actions/checkout@v4
+      with:
+        repository: Pince-Rioux/ClubSite.Membership
+        path: Membership
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore repo/ClubSite.sln
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build repo/ClubSite.sln --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test repo/ClubSite.sln --no-build --verbosity normal
