@@ -17,6 +17,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        path: repo
     - name: Checkout Membership RCL
       uses: actions/checkout@v4
       with:
@@ -32,14 +34,14 @@ jobs:
         <?xml version="1.0" encoding="utf-8"?>
         <configuration>
           <packageSources>
-            <add key="LocalPackages" value="./LocalPackages" />
+            <add key="LocalPackages" value="${{ github.workspace }}/repo/LocalPackages" />
             <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
           </packageSources>
         </configuration>
         EOF
     - name: Restore dependencies
-      run: dotnet restore ClubSite/ClubSite.sln --configfile NuGet.config
+      run: dotnet restore repo/ClubSite.sln --configfile NuGet.config
     - name: Build
-      run: dotnet build ClubSite/ClubSite.sln --no-restore -nowarn:CS0162,CS0436
+      run: dotnet build repo/ClubSite.sln --no-restore -nowarn:CS0162,CS0436
     - name: Test
-      run: dotnet test ClubSite/ClubSite.sln --no-build --verbosity normal
+      run: dotnet test repo/ClubSite.sln --no-build --verbosity normal
