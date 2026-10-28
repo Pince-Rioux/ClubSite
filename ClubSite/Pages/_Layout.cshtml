@@ -29,14 +29,15 @@
 <body>
 <div class="container-fluid main p-0 mb-2">
     <div class="mb-3" role="menu">
-        <partial name="_MenuTopLevel.cshtml" />
+        <partial name="~/Pages/_MenuTopLevel.cshtml" />
     </div>
     @RenderBody()
-    <partial name="_Footer.cshtml" />
-    <partial name="_CookieConsent.cshtml" />
+    <partial name="~/Pages/_Footer.cshtml" />
+    <partial name="~/Pages/_CookieConsent.cshtml" />
 </div>
-<partial name="_GoogleAnalytics.cshtml"/>
+<partial name="~/Pages/_GoogleAnalytics.cshtml"/>
 <script src="~/assets/js/bootstrap/bootstrap.bundle.min.js" asp-append-version="true"></script>
 @await RenderSectionAsync("script", false)
+@await RenderSectionAsync("Scripts", false)
 </body>
 </html>
