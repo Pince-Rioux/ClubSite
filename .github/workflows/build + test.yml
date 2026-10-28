@@ -17,6 +17,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: Checkout Membership RCL
+      uses: actions/checkout@v4
+      with:
+        repository: Pince-Rioux/ClubSite.Membership
+        path: Membership
+        token: ${{ secrets.GITHUB_TOKEN }}
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
@@ -32,10 +38,9 @@ jobs:
           </packageSources>
         </configuration>
         EOF
-        ls ./LocalPackages
     - name: Restore dependencies
-      run: dotnet restore --configfile NuGet.config
+      run: dotnet restore ClubSite/ClubSite.sln --configfile NuGet.config
     - name: Build
-      run: dotnet build --no-restore -nowarn:CS0162,CS0436
+      run: dotnet build ClubSite/ClubSite.sln --no-restore -nowarn:CS0162,CS0436
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test ClubSite/ClubSite.sln --no-build --verbosity normal
