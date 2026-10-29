@@ -10,17 +10,6 @@
 <div class="mx-3 py-2">
     @{
         ViewData["Title"] = "Kontakt";
-
-        List<SelectListItem> GenderList()
-        {
-            return
-            [
-                new SelectListItem { Value = string.Empty, Text = "Bitte auswählen" },
-                new SelectListItem { Value = "f", Text = "Frau" },
-                new SelectListItem { Value = "m", Text = "Herr" },
-                new SelectListItem { Value = "u", Text = "Keine Angabe" }
-            ];
-        }
     }
     <div>
         <h2 class="h2">@ViewData["Title"]</h2>
@@ -39,7 +28,7 @@
             </div>
             <div class="col-md-6">
                 <label asp-for="Gender" class="form-label"></label>
-                <select asp-for="Gender" asp-items="GenderList()" class="form-select" required="required"></select>
+                <select asp-for="Gender" asp-items="Helpers.FormOptions.GenderList()" class="form-select" required="required"></select>
                 <span asp-validation-for="Gender" class="text-danger"></span>
             </div>
             <div>
