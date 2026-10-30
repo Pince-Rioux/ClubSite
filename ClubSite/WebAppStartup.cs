@@ -27,8 +27,8 @@ using Piranha;
 using ClubSite.Data; // ClubDbContext (Piranha), keeps existing code
 using ClubSite.Models; // Custom Piranha block types
 // Membership RCL — activated by config flag
-using ClubSite.Membership.Extensions;
-using ClubSite.Membership.Services;
+using VereinMember.Extensions;
+using VereinMember.Services;
 
 namespace ClubSite;
 
@@ -63,7 +63,7 @@ public static class WebAppStartup
         var membershipEnabled = configuration.GetValue<bool>("ClubMembership:Enabled");
         if (membershipEnabled)
         {
-            services.AddClubSiteMembership(configuration);
+            services.AddVereinMember(configuration);
 
             // Override the RCL's log-only email sender with the real ClubSite mail service
             services.AddScoped<IEmailSender, ClubSiteEmailSender>();

@@ -3,7 +3,7 @@
 // of the MIT license. See the LICENSE file for details.
 // https://github.com/axuno/ClubSite
 
-using ClubSite.Membership.Services;
+using VereinMember.Services;
 using ClubSite.Services;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
