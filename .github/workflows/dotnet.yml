@@ -21,7 +21,7 @@ jobs:
     - name: Checkout Membership RCL
       uses: actions/checkout@v4
       with:
-        repository: Pince-Rioux/ClubSite.Membership
+        repository: Pince-Rioux/VereinMember
         path: Membership
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
