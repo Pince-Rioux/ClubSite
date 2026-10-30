@@ -43,7 +43,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../Membership/src/ClubSite.Membership/ClubSite.Membership.csproj" />
+    <ProjectReference Include="../../Membership/src/VereinMember/VereinMember.csproj" />
   </ItemGroup>
 
   <ItemGroup>
