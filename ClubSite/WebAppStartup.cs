@@ -193,10 +193,12 @@ public static class WebAppStartup
         {
             app.Use(async (context, next) =>
             {
-                if (context.Request.Path.StartsWith("/Membership/")
-                    || context.Request.Path == "/Membership")
+                var path = context.Request.Path.ToString();
+                if (path.StartsWith("/Membership/")
+                    || path == "/Membership")
                 {
-                    return context.NotFound();
+                    context.Response.StatusCode = 404;
+                    return;
                 }
                 return await next();
             });
