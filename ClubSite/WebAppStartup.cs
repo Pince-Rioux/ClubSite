@@ -73,16 +73,7 @@ public static class WebAppStartup
         }
         else
         {
-            // Block access to membership routes when feature is disabled
-            app.Use(async (context, next) =>
-            {
-                if (context.Request.Path.StartsWith("/Membership/")
-                    || context.Request.Path == "/Membership")
-                {
-                    return context.NotFound();
-                }
-                return await next();
-            });
+            // Middleware is in Configure() below (app is not in scope here)
         }
 
         // Piranha service setup
@@ -196,6 +187,20 @@ public static class WebAppStartup
         }
 
         #endregion
+
+        // Block /Membership/* when feature is disabled
+        if (!app.Configuration.GetValue<bool>("ClubMembership:Enabled"))
+        {
+            app.Use(async (context, next) =>
+            {
+                if (context.Request.Path.StartsWith("/Membership/")
+                    || context.Request.Path == "/Membership")
+                {
+                    return context.NotFound();
+                }
+                return await next();
+            });
+        }
 
         // Keep before .UsePiranha()
         app.UseSession();
