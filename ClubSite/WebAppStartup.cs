@@ -212,9 +212,10 @@ public static class WebAppStartup
             options.UseTinyMCE();
             options.UseIdentity();
             
-            // Build all content types in this assembly
+            // Build all content types (ClubSite + VereinMember RCL)
             _ = new ContentTypeBuilder(options.Api)
                 .AddAssembly(typeof(Program).Assembly)
+                .AddAssembly(typeof(VereinMember.Extensions.ServiceCollectionExtensions).Assembly)
                 .Build()
                 .DeleteOrphans();
         });
