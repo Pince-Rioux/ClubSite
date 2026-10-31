@@ -60,7 +60,7 @@ public static class WebAppStartup
             options.UseSqlServer(configuration.GetConnectionString("VolleyballClub")));
 
         // === Membership Module (RCL) — optional, activated by config ===
-        var membershipEnabled = app.Configuration.GetValue<bool>("ClubMembership:Enabled");
+        var membershipEnabled = configuration.GetValue<bool>("ClubMembership:Enabled");
 
         // Services MUST be registered regardless of Enabled flag,
         // otherwise DI validation fails when AddAssembly registers controllers.
