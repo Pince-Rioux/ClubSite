@@ -71,6 +71,22 @@ public static class WebAppStartup
             // Override the RCL's log-only email sender with the real ClubSite mail service
             services.AddScoped<IEmailSender, ClubSiteEmailSender>();
         }
+        else
+        {
+            // Block access to membership routes when feature is disabled
+            services.AddInitializer(app =>
+            {
+                app.Use(async (context, next) =>
+                {
+                    if (context.Request.Path.StartsWith("/Membership/")
+                        || context.Request.Path == "/Membership")
+                    {
+                        return context.NotFound();
+                    }
+                    return await next();
+                });
+            });
+        }
 
         // Piranha service setup
         services.AddPiranha(svcBuilder =>
