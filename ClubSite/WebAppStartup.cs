@@ -37,7 +37,6 @@ namespace ClubSite;
 /// </summary>
 public static class WebAppStartup
 {
-    private static bool _membershipEnabled = true;
     /// <summary>
     /// The method gets called by <see cref="Program"/> at startup, BEFORE building the app is completed.
     /// </summary>
@@ -62,7 +61,6 @@ public static class WebAppStartup
 
         // === Membership Module (RCL) — optional, activated by config ===
         var membershipEnabled = configuration.GetValue<bool>("ClubMembership:Enabled");
-        WebAppStartup._membershipEnabled = membershipEnabled;
 
         // Services MUST be registered regardless of Enabled flag,
         // otherwise DI validation fails when AddAssembly registers controllers.
@@ -222,19 +220,11 @@ public static class WebAppStartup
             options.UseIdentity();
             
             // Build ClubSite content types
-            _ = new ContentTypeBuilder(options.Api)
+        _ = new ContentTypeBuilder(options.Api)
                 .AddAssembly(typeof(Program).Assembly)
+                .AddAssembly(typeof(VereinMember.Extensions.ServiceCollectionExtensions).Assembly)
                 .Build()
                 .DeleteOrphans();
-
-            // Add VereinMember RCL page types only when feature is enabled
-            if (WebAppStartup._membershipEnabled)
-            {
-                _ = new ContentTypeBuilder(options.Api)
-                    .AddAssembly(typeof(VereinMember.Extensions.ServiceCollectionExtensions).Assembly)
-                    .Build()
-                    .DeleteOrphans();
-            }
         });
 
         // Register custom blocks
