@@ -74,17 +74,14 @@ public static class WebAppStartup
         else
         {
             // Block access to membership routes when feature is disabled
-            services.AddInitializer(app =>
+            app.Use(async (context, next) =>
             {
-                app.Use(async (context, next) =>
+                if (context.Request.Path.StartsWith("/Membership/")
+                    || context.Request.Path == "/Membership")
                 {
-                    if (context.Request.Path.StartsWith("/Membership/")
-                        || context.Request.Path == "/Membership")
-                    {
-                        return context.NotFound();
-                    }
-                    return await next();
-                });
+                    return context.NotFound();
+                }
+                return await next();
             });
         }
 
