@@ -60,7 +60,7 @@ public static class WebAppStartup
             options.UseSqlServer(configuration.GetConnectionString("VolleyballClub")));
 
         // === Membership Module (RCL) — optional, activated by config ===
-        var membershipEnabled = configuration.GetValue<bool>("ClubMembership:Enabled");
+        var membershipEnabled = app.Configuration.GetValue<bool>("ClubMembership:Enabled");
 
         // Services MUST be registered regardless of Enabled flag,
         // otherwise DI validation fails when AddAssembly registers controllers.
@@ -188,22 +188,6 @@ public static class WebAppStartup
 
         #endregion
 
-        // Block /Membership/* when feature is disabled
-        if (!app.Configuration.GetValue<bool>("ClubMembership:Enabled"))
-        {
-            app.Use(async (Microsoft.AspNetCore.Http.HttpContext context,
-                           Microsoft.AspNetCore.Http.Func<Microsoft.AspNetCore.Mvc.IActionResult> next) =>
-            {
-                var path = context.Request.Path.ToString();
-                if (path.StartsWith("/Membership/")
-                    || path == "/Membership")
-                {
-                    return context.DenyRequest();
-                }
-                return next.Handle(context);
-            });
-        }
-
         // Keep before .UsePiranha()
         app.UseSession();
 
@@ -235,12 +219,21 @@ public static class WebAppStartup
             options.UseTinyMCE();
             options.UseIdentity();
             
-            // Build all content types (ClubSite + VereinMember RCL)
+            // Build ClubSite content types
             _ = new ContentTypeBuilder(options.Api)
                 .AddAssembly(typeof(Program).Assembly)
-                .AddAssembly(typeof(VereinMember.Extensions.ServiceCollectionExtensions).Assembly)
                 .Build()
                 .DeleteOrphans();
+
+            // Add VereinMember RCL page types only when feature is enabled
+            var membershipEnabled = app.Configuration.GetValue<bool>("ClubMembership:Enabled");
+            if (membershipEnabled)
+            {
+                _ = new ContentTypeBuilder(options.Api)
+                    .AddAssembly(typeof(VereinMember.Extensions.ServiceCollectionExtensions).Assembly)
+                    .Build()
+                    .DeleteOrphans();
+            }
         });
 
         // Register custom blocks
