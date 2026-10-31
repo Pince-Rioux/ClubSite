@@ -235,11 +235,16 @@ public static class WebAppStartup
             ContentTypeProvider = provider,
             OnPrepareResponse = ctx =>
             {
-                var headers = ctx.Context.Response.GetTypedHeaders();
-                headers.CacheControl = new CacheControlHeaderValue {
-                    Public = true,
-                    MaxAge = TimeSpan.FromDays(5)
-                };
+                // In Development: kein Cache-Header (Safari würde CSS/JS 5 Tage cachen)
+                // In Production: 5 Tage Cache für statische Assets
+                if (!app.Environment.IsDevelopment())
+                {
+                    var headers = ctx.Context.Response.GetTypedHeaders();
+                    headers.CacheControl = new CacheControlHeaderValue {
+                        Public = true,
+                        MaxAge = TimeSpan.FromDays(5)
+                    };
+                }
             }
         });
     }
