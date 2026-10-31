@@ -188,22 +188,6 @@ public static class WebAppStartup
 
         #endregion
 
-        // Block /Membership/* when feature is disabled
-        if (!app.Configuration.GetValue<bool>("ClubMembership:Enabled"))
-        {
-            app.Use(async (context, next) =>
-            {
-                var path = context.Request.Path.ToString();
-                if (path.StartsWith("/Membership/")
-                    || path == "/Membership")
-                {
-                    context.Response.StatusCode = 404;
-                    return;
-                }
-                return await next();
-            });
-        }
-
         // Keep before .UsePiranha()
         app.UseSession();
 
