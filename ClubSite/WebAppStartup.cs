@@ -61,10 +61,13 @@ public static class WebAppStartup
 
         // === Membership Module (RCL) — optional, activated by config ===
         var membershipEnabled = configuration.GetValue<bool>("ClubMembership:Enabled");
+
+        // Services MUST be registered regardless of Enabled flag,
+        // otherwise DI validation fails when AddAssembly registers controllers.
+        services.AddVereinMember(configuration);
+
         if (membershipEnabled)
         {
-            services.AddVereinMember(configuration);
-
             // Override the RCL's log-only email sender with the real ClubSite mail service
             services.AddScoped<IEmailSender, ClubSiteEmailSender>();
         }
