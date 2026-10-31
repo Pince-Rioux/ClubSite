@@ -188,6 +188,22 @@ public static class WebAppStartup
 
         #endregion
 
+        // Block /Membership/* when feature is disabled
+        if (!app.Configuration.GetValue<bool>("ClubMembership:Enabled"))
+        {
+            app.Use(async (Microsoft.AspNetCore.Http.HttpContext context,
+                           Microsoft.AspNetCore.Http.Func<Microsoft.AspNetCore.Mvc.IActionResult> next) =>
+            {
+                var path = context.Request.Path.ToString();
+                if (path.StartsWith("/Membership/")
+                    || path == "/Membership")
+                {
+                    return context.DenyRequest();
+                }
+                return next.Handle(context);
+            });
+        }
+
         // Keep before .UsePiranha()
         app.UseSession();
 
