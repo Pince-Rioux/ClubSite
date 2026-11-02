@@ -44,4 +44,5 @@ public class CalendarEventItem
     public string Team { get; init; } = string.Empty;
     public string Category { get; init; } = string.Empty;
     public bool IsHomeGame { get; init; }
+    public string? Url { get; init; }
 }

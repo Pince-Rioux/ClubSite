@@ -257,3 +257,6 @@ paket-files/
 
 # Chromium browser to generate PDF
 DataProtectionKeys/
+
+# Credentials - never commit real secrets
+ClubSite/Configuration/Credentials.*.json

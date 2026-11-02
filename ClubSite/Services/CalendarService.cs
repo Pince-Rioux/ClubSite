@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Ical.Net;
 using Ical.Net.CalendarComponents;
+using Ical.Net.DataTypes;
 using Ical.Net.Serialization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
@@ -21,7 +22,7 @@ public class CalendarService : ICalendarService
 
     private readonly string _webRoot;
     private readonly ILogger<CalendarService> _logger;
-    private bool? _hasCalendarFiles;
+    private Calendar? _cachedCalendar;
 
     public CalendarService(IWebHostEnvironment env, ILogger<CalendarService> logger)
     {
@@ -29,10 +30,6 @@ public class CalendarService : ICalendarService
         _logger = logger;
     }
 
-    /// <summary>
-    /// Returns calendar events within the given date range.
-    /// Uses iCal.Net's built-in GetOccurrences for RRULE expansion.
-    /// </summary>
     public List<CalendarEventItem> GetEvents(DateTime rangeStart, DateTime rangeEnd)
     {
         var calendar = LoadCalendar();
@@ -44,39 +41,23 @@ public class CalendarService : ICalendarService
         {
             if (ev.DtStart == null || count >= MaxEvents) continue;
 
-            var baseStart = ToLocalDate(ev.DtStart);
-            var baseEnd = ev.DtEnd != null ? ToLocalDate(ev.DtEnd) : baseStart;
-            
+            var start = ToCalLocal(ev.DtStart);
+            var end = ev.DtEnd != null ? ToCalLocal(ev.DtEnd) : start;
+
             var (team, category) = ParseCategories(ev);
-            var location = ev.Location?.ToString() ?? string.Empty;
+            // ICal.Net 6 Location property returns only venue name, not full address
+            // Use raw property value for the complete address
+            string location = ev.Location?.ToString() ?? string.Empty;
 
-            // iCal.Net handles RRULE expansion natively
-            List<DateTime> occurrences = [];
-            try
+            if (IsRecurring(ev))
             {
-                var occ = ev.GetOccurrences<DateTime>(rangeStart, rangeEnd);
-                if (occ != null) occurrences = [.. occ];
+                ExpandOccurrences(ev, start, end, rangeStart, rangeEnd, team, category, location, items);
             }
-            catch (Exception) { }
-
-            if (occurrences.Length == 0)
-                occurrences = [baseStart];
-
-            foreach (var occStart in occurrences)
+            else
             {
-                if (count++ >= MaxEvents) break;
-                var duration = baseEnd - baseStart;
-                items.Add(new CalendarEventItem
-                {
-                    Title = ev.Summary ?? "(no title)",
-                    StartDate = occStart,
-                    EndDate = occStart + duration,
-                    Location = location,
-                    Description = ev.Description ?? string.Empty,
-                    Team = team,
-                    Category = category,
-                    IsHomeGame = IsHomeVenue(location)
-                });
+                if (end < rangeStart || start > rangeEnd) continue;
+                items.Add(MakeItem(ev, start, end, team, category, location));
+                count++;
             }
         }
         return [.. items.OrderBy(e => e.StartDate)];
@@ -90,12 +71,13 @@ public class CalendarService : ICalendarService
 
     public bool HasCalendarFiles()
     {
-        _hasCalendarFiles ??= FindCalendarFile() != null;
-        return _hasCalendarFiles.Value;
+        return LoadCalendar() != null;
     }
 
     private Calendar? LoadCalendar()
     {
+        if (_cachedCalendar != null) return _cachedCalendar;
+
         var calendarFile = FindCalendarFile();
         if (calendarFile == null) return null;
 
@@ -103,13 +85,13 @@ public class CalendarService : ICalendarService
         {
             var icsContent = File.ReadAllText(calendarFile);
             var calendars = CalendarSerializer.DeserializeCollection<Calendar>(icsContent);
-            return calendars?.FirstOrDefault();
+            _cachedCalendar = calendars?.FirstOrDefault();
         }
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Failed to parse calendar file {FilePath}", calendarFile);
         }
-        return null;
+        return _cachedCalendar;
     }
 
     private string? FindCalendarFile()
@@ -123,6 +105,59 @@ public class CalendarService : ICalendarService
         return files.OrderByDescending(File.GetLastWriteTime).First();
     }
 
+    private static bool IsRecurring(CalendarEvent ev) =>
+        ev.RecurrenceRule != null && ev.RecurrenceRule.Frequency == FrequencyType.Weekly;
+
+    private static void ExpandOccurrences(CalendarEvent ev, DateTime start, DateTime end,
+        DateTime rangeStart, DateTime rangeEnd, string team, string category, string location,
+        List<CalendarEventItem> items)
+    {
+        var rule = ev.RecurrenceRule!;
+        var duration = end - start;
+        var until = rule.Until?.ToDateTimeUnspecified() ?? rangeEnd;
+        if (until > rangeEnd) until = rangeEnd;
+
+        var maxOcc = rule.Count > 0 ? rule.Count : 200;
+        var interval = rule.Interval > 0 ? rule.Interval : 1;
+
+        List<int> dayNums = [];
+        if (rule.ByDay?.Count > 0)
+            dayNums = [.. rule.ByDay.Select(wd => (int)wd.DayOfWeek)];
+        else
+            dayNums = [(int)start.DayOfWeek];
+
+        var current = start > rangeStart ? start : rangeStart;
+        var occCount = 0;
+        while (current <= until && occCount < maxOcc)
+        {
+            foreach (var d in dayNums)
+            {
+                var diff = d - (int)current.DayOfWeek;
+                if (diff < 0) diff += 7;
+                var occDate = current.AddDays(diff);
+                if (occDate < start || occDate > until) continue;
+                items.Add(MakeItem(ev, occDate + start.TimeOfDay, occDate + start.TimeOfDay + duration, team, category, location));
+                if (++occCount >= maxOcc) break;
+            }
+            if (occCount >= maxOcc) break;
+            current = current.AddDays(7 * interval);
+        }
+    }
+
+    private static CalendarEventItem MakeItem(CalendarEvent ev, DateTime start, DateTime end,
+        string team, string category, string location) => new CalendarEventItem
+    {
+        Title = ev.Summary?.ToString() ?? "(no title)",
+        StartDate = start,
+        EndDate = end,
+        Location = location,
+        Description = ev.Description?.ToString() ?? string.Empty,
+        Team = team,
+        Category = category,
+        IsHomeGame = IsHomeGame(category),
+        Url = ev.Url?.ToString()
+    };
+
     private static (string team, string category) ParseCategories(CalendarEvent ev)
     {
         if (ev.Categories is not { Count: > 0 })
@@ -130,18 +165,28 @@ public class CalendarService : ICalendarService
         return (ev.Categories[0], ev.Categories.Count > 1 ? ev.Categories[1] : string.Empty);
     }
 
-    private static DateTime ToLocalDate(DateTime dt)
+    private static DateTime ToLocal(DateTime dt)
     {
         if (dt.Kind == DateTimeKind.Utc)
             return TimeZoneInfo.ConvertTimeFromUtc(dt, TimeZoneInfo.Local);
         return dt;
     }
 
-    private static bool IsHomeVenue(string location)
+    /// <summary>
+    /// Converts a CalDateTime (iCal.Net 6) to a local DateTime.
+    /// </summary>
+    private static DateTime ToCalLocal(CalDateTime cal)
     {
-        if (string.IsNullOrWhiteSpace(location)) return false;
-        var loc = location.ToLowerInvariant();
-        return loc.Contains("neusäß") || loc.Contains("neusaess") || loc.Contains("86356");
+        var dt = cal.ToDateTimeUnspecified();
+        if (cal.IsUtc)
+            return TimeZoneInfo.ConvertTimeFromUtc(dt, TimeZoneInfo.Local);
+        return dt;
+    }
+
+    private static bool IsHomeGame(string category)
+    {
+        return !string.IsNullOrEmpty(category)
+            && category.ToLowerInvariant().Contains("heimspieltag");
     }
 
     private List<string> CollectDistinct(Func<CalendarEventItem, string> selector)

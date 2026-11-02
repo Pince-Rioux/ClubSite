@@ -1,7 +1,6 @@
-﻿@page
+@page
 @model ClubSite.Pages.CalendarPageModel
 @{
-    ViewData["Version"] = "2.0";
     ViewData["Title"] = "Termine";
 }
 <div class="mx-3 py-2">
@@ -67,7 +66,7 @@
                         <th scope="col" style="width: 70px">Uhrzeit</th>
                         <th scope="col">Titel</th>
                         <th scope="col" style="width: 100px">Team</th>
-                        <th scope="col" style="width: 120px">Kategorie</th>
+                        <th scope="col" style="width: 110px">Kategorie</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -78,25 +77,20 @@
                             <td>@evt.StartDate.ToString("HH:mm")@if (evt.EndDate.TimeOfDay != evt.StartDate.TimeOfDay) {@( " – " + evt.EndDate.ToString("HH:mm"))}</td>
                             <td>
                                 <div class="fw-semibold">
-                                    @evt.Title
-                                    @if (evt.IsHomeGame)
+                                    @if (!string.IsNullOrEmpty(evt.Url))
                                     {
-                                        <span class="badge bg-success ms-1" title="Heimspiel">🏠 Heim</span>
+                                        <a href="@evt.Url" target="_blank">@evt.Title</a>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-secondary ms-1" title="Auswärtsspiel">🚗 Auswärts</span>
+                                        @evt.Title
                                     }
                                 </div>
                                 @if (!string.IsNullOrEmpty(evt.Location))
                                 {
                                     <div class="small text-muted"><i class="fas fa-map-marker-alt me-1"></i>@evt.Location</div>
                                 }
-                                @if (!string.IsNullOrEmpty(evt.Description))
-                                {
-                                    <div class="small text-muted mt-1">@evt.Description</div>
-                                }
-</td>
+                            </td>
                             <td>
                                 @if (!string.IsNullOrEmpty(evt.Team))
                                 {
@@ -116,5 +110,3 @@
         }
     }
 </div>
-
-<div class="small text-muted text-center mt-2">Version: @ViewData["Version"]</div>
