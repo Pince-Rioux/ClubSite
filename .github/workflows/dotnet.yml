@@ -30,8 +30,8 @@ jobs:
           8.0.x
           10.0.x
     - name: Restore dependencies
-      run: dotnet restore repo/ClubSite.slnx
+      run: dotnet restore repo/ClubSite.sln
     - name: Build
-      run: dotnet build repo/ClubSite.slnx --no-restore
+      run: dotnet build repo/ClubSite.sln --no-restore
     - name: Test
-      run: dotnet test repo/ClubSite.slnx --no-build --verbosity normal --filter "TestCategory!=Integration"
+      run: dotnet test repo/ClubSite.sln --no-build --verbosity normal --filter "TestCategory!=Integration"
