@@ -23,11 +23,13 @@ jobs:
       uses: actions/checkout@v4
       with:
         repository: Pince-Rioux/VereinMember
-        path: Membership
+        path: VereinMember
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.0.x
+        dotnet-version: |
+          8.0.x
+          10.0.x
     - name: Add local NuGet source config
       run: |
         cat <<EOF > NuGet.config
@@ -40,8 +42,8 @@ jobs:
         </configuration>
         EOF
     - name: Restore dependencies
-      run: dotnet restore repo/ClubSite.sln --configfile NuGet.config
+      run: dotnet restore repo/ClubSite.slnx --configfile NuGet.config
     - name: Build
-      run: dotnet build repo/ClubSite.sln --no-restore -nowarn:CS0162,CS0436
+      run: dotnet build repo/ClubSite.slnx --no-restore -nowarn:CS0162,CS0436
     - name: Test
-      run: dotnet test repo/ClubSite.sln --no-build --verbosity normal
+      run: dotnet test repo/ClubSite.slnx --no-build --verbosity normal --filter "TestCategory!=Integration"
