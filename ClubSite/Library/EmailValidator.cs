@@ -10,11 +10,6 @@ public static class EmailValidator
 {
     public static bool IsValid(string? email)
     {
-        if (string.IsNullOrWhiteSpace(email))
-        {
-            return false;
-        }
-
         try
         {
             _ = new MimeKit.MailboxAddress(email, email);
