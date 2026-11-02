@@ -16,16 +16,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7.0.1
       with:
         path: repo
     - name: Checkout Membership RCL
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7.0.1
       with:
         repository: Pince-Rioux/VereinMember
         path: VereinMember
     - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v6.0.0
       with:
         dotnet-version: |
           8.0.x
