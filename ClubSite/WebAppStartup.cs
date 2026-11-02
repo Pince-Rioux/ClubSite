@@ -59,22 +59,8 @@ public static class WebAppStartup
         services.AddDbContext<Data.ClubDbContext>((sp, options) =>
             options.UseSqlServer(configuration.GetConnectionString("VolleyballClub")));
 
-        // === Membership Module (RCL) — optional, activated by config ===
-        var membershipEnabled = configuration.GetValue<bool>("ClubMembership:Enabled");
-
-        // Services MUST be registered regardless of Enabled flag,
-        // otherwise DI validation fails when AddAssembly registers controllers.
+        // Membership RCL — services registered regardless of flag (DI validation)
         services.AddVereinMember(configuration);
-
-        if (membershipEnabled)
-        {
-            // Override the RCL's log-only email sender with the real ClubSite mail service
-            services.AddScoped<IEmailSender, ClubSiteEmailSender>();
-        }
-        else
-        {
-            // Middleware is in Configure() below (app is not in scope here)
-        }
 
         // Piranha service setup
         services.AddPiranha(svcBuilder =>
