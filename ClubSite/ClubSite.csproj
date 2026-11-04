@@ -29,7 +29,7 @@
     <PackageReference Include="Piranha.AspNetCore.Identity" Version="12.0.0" />
     <PackageReference Include="Piranha.AspNetCore.Identity.SQLServer" Version="12.0.0" />
     <PackageReference Include="Piranha.AspNetCore.SimpleSecurity" Version="10.4.0" />
-    <PackageReference Include="VereinMember" Version="1.0.0-dev" />
+    <PackageReference Include="VereinMember" Version="1.0.1-dev" />
     <PackageReference Include="Piranha.AttributeBuilder" Version="12.0.0" />
     <PackageReference Include="Piranha.Data.EF.SQLServer" Version="12.0.0" />
     <PackageReference Include="Piranha.ImageSharp" Version="12.0.0" />
