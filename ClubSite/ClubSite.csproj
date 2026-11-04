@@ -16,6 +16,8 @@
     <SatelliteResourceLanguages>en;de</SatelliteResourceLanguages>
   </PropertyGroup>
   <ItemGroup>
+    <!-- Build-time dependency closure only: the module is loaded by path at runtime,
+         and these references ensure its transitive assemblies land next to the host binary. -->
     <PackageReference Include="Azure.Identity" Version="1.21.0" />
     <PackageReference Include="EPPlus" Version="8.6.1" />
     <PackageReference Include="MailKit" Version="4.17.0" />
@@ -27,6 +29,7 @@
     <PackageReference Include="Piranha.AspNetCore.Identity" Version="12.0.0" />
     <PackageReference Include="Piranha.AspNetCore.Identity.SQLServer" Version="12.0.0" />
     <PackageReference Include="Piranha.AspNetCore.SimpleSecurity" Version="10.4.0" />
+    <PackageReference Include="VereinMember" Version="1.0.0-dev" />
     <PackageReference Include="Piranha.AttributeBuilder" Version="12.0.0" />
     <PackageReference Include="Piranha.Data.EF.SQLServer" Version="12.0.0" />
     <PackageReference Include="Piranha.ImageSharp" Version="12.0.0" />

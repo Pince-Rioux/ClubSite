@@ -25,6 +25,9 @@ using Microsoft.Net.Http.Headers;
 using Piranha.AttributeBuilder;
 using Piranha.Manager.Editor;
 using Piranha;
+using Microsoft.AspNetCore.Mvc.Razor;
+using VereinMember;
+using VereinMember.Extensions;
 
 namespace ClubSite;
 
@@ -33,6 +36,10 @@ namespace ClubSite;
 /// </summary>
 public static class WebAppStartup
 {
+    /// <summary>
+    /// The loaded module assembly for PIRANHA content types.
+    /// </summary>
+    private static System.Reflection.Assembly? _moduleAssembly;
     /// <summary>
     /// The method gets called by <see cref="Program"/> at startup, BEFORE building the app is completed.
     /// </summary>
@@ -81,7 +88,21 @@ public static class WebAppStartup
             options.Cookie.IsEssential = true;
         });
 
-        services.AddRazorPages().AddPiranhaManagerOptions();
+        // === Optional module (plugin) ===
+        if (configuration.GetValue<bool>("Modules:VereinMember:Enabled"))
+        {
+            services.AddVereinMember(configuration);
+            _moduleAssembly = typeof(AppModule).Assembly;
+        }
+
+        services.AddRazorPages()
+            .AddPiranhaManagerOptions();        
+        services.Configure<Microsoft.AspNetCore.Mvc.ApplicationParts.ApplicationPartManager>(manager =>
+        {
+            if (_moduleAssembly != null)
+                manager.ApplicationParts.Add(
+                    new Microsoft.AspNetCore.Mvc.ApplicationParts.AssemblyPart(_moduleAssembly));
+        });
 
         services.AddMvc()
             .AddSessionStateTempDataProvider()
@@ -94,6 +115,12 @@ public static class WebAppStartup
                 options.ModelBindingMessageProvider.SetMissingKeyOrValueAccessor(() => Resources.ModelBindingMessageResource.MissingKeyOrValue);
             })
             .AddControllersAsServices();
+        services.Configure<RazorViewEngineOptions>(options =>
+        {
+            options.AreaPageViewLocationFormats.Add("/Pages/{0}.cshtml");
+            options.AreaPageViewLocationFormats.Add("/Pages/Shared/{0}.cshtml");
+            options.PageViewLocationFormats.Add("/Pages/Shared/{0}.cshtml");
+        });
 
         services.AddHttpsRedirection(options =>
         {
@@ -108,7 +135,7 @@ public static class WebAppStartup
         services.AddTransient<Services.IMailService, Services.MailService>();
 
         // We use EPPlus in a noncommercial context according to the Polyform Noncommercial license:
-        OfficeOpenXml.ExcelPackage.License.SetNonCommercialOrganization("Volleyballclub Neus‰ﬂ e.V.");
+        OfficeOpenXml.ExcelPackage.License.SetNonCommercialOrganization("Volleyballclub Neus√§√ü e.V.");
     }
 
     /// <summary>
@@ -172,10 +199,13 @@ public static class WebAppStartup
 
         #region *** Rewrite domains (even those without SSL certificate) to https://www.volleyballclub.de ***
 
-        app.UseRewriter(new RewriteOptions()
-            .AddRedirectToWwwPermanent()
-            .AddRedirectToHttpsPermanent()
-        );
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseRewriter(new RewriteOptions()
+                .AddRedirectToWwwPermanent()
+                .AddRedirectToHttpsPermanent()
+            );
+        }
 
         #endregion
 
@@ -196,8 +226,11 @@ public static class WebAppStartup
             options.UseIdentity();
             
             // Build all content types in this assembly
-            _ = new ContentTypeBuilder(options.Api)
-                .AddAssembly(typeof(Program).Assembly)
+            var contentTypeBuilder = new ContentTypeBuilder(options.Api)
+                .AddAssembly(typeof(Program).Assembly);
+            if (_moduleAssembly != null)
+                contentTypeBuilder = contentTypeBuilder.AddAssembly(_moduleAssembly);
+            _ = contentTypeBuilder
                 .Build()
                 .DeleteOrphans();
 
