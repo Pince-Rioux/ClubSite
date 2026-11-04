@@ -22,11 +22,11 @@ jobs:
     - name: Add NuGet sources
       run: |
         dotnet nuget source add "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
-          --name github \
-          --username "${{ github.actor }}" \
-          --password "${{ secrets.GH_PAT }}" || true
+          -n github -n github \
+           -u "${{ github.actor }}" \
+           -p "${{ secrets.GH_PAT }}" || true
         dotnet nuget source add ./LocalPackages \
-          --name LocalPackages || true
+          -n LocalPackages || true
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
