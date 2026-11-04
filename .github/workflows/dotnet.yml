@@ -1,6 +1,3 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
 name: .NET
 
 on:
@@ -11,9 +8,7 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
     - name: Setup .NET
@@ -25,7 +20,7 @@ jobs:
         dotnet nuget source add "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
           --name github \
           --username "${{ github.actor }}" \
-          --password "${{ secrets.GITHUB_TOKEN }}" || true
+          --password "${{ secrets.GH_PAT }}" || true
         dotnet nuget source add ./LocalPackages \
           --name LocalPackages || true
     - name: Restore dependencies
