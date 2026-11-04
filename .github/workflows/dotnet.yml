@@ -20,19 +20,16 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
-    - name: Add local NuGet source config
+    - name: Add NuGet sources
       run: |
-        cat <<EOF > NuGet.config
-        <?xml version="1.0" encoding="utf-8"?>
-        <configuration>
-          <packageSources>
-            <add key="LocalPackages" value="./LocalPackages" />
-            <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
-          </packageSources>
-        </configuration>
-        EOF
+        dotnet nuget source add "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
+          --name github \
+          --username "${{ github.actor }}" \
+          --password "${{ secrets.GITHUB_TOKEN }}" || true
+        dotnet nuget source add ./LocalPackages \
+          --name LocalPackages || true
     - name: Restore dependencies
-      run: dotnet restore --configfile NuGet.config
+      run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
     - name: Test
